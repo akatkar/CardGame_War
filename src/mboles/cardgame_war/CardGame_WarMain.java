@@ -1,0 +1,263 @@
+package mboles.cardgame_war;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.*;
+
+public class CardGame_WarMain extends Activity 
+{
+
+	private ImageView p1Card, p2Card, p1TieCard, p2TieCard, p1Wager, p2Wager, p1DoubleTie, p2DoubleTie;
+	private TextView winner, p1Count, p2Count;
+	private TextView player1TieCardDisplay, player2TieCardDisplay;
+	private Button playButton;
+	private Card card;
+	private Bitmap initialBitmap;
+	private BufferedInputStream faceDown;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_card_game__war_main);
+		
+		final AssetManager am = getAssets();
+		try
+		{
+			faceDown = new BufferedInputStream(am.open("face_down.png"));
+			initialBitmap = BitmapFactory.decodeStream(faceDown);
+			
+			card = new Card();
+			card.createAndSplit();
+			
+			p1Card = (ImageView)findViewById(R.id.player1_card);
+			p1Card.setImageBitmap(initialBitmap);
+			
+			p2Card = (ImageView)findViewById(R.id.player2_image);
+			p2Card.setImageBitmap(initialBitmap);
+			
+			winner = (TextView)findViewById(R.id.winner_tv);
+			p1Count = (TextView)findViewById(R.id.p1_count_tv);
+			p2Count = (TextView)findViewById(R.id.p2_count_tv);
+			p1TieCard = (ImageView)findViewById(R.id.player1_tie_image);
+			p2TieCard = (ImageView)findViewById(R.id.player2_tie_image);
+			p1Wager = (ImageView)findViewById(R.id.player1_wager_image);
+			p2Wager = (ImageView)findViewById(R.id.player2_wager_image);
+			p1DoubleTie = (ImageView)findViewById(R.id.player1_double_tie_image);
+			p2DoubleTie = (ImageView)findViewById(R.id.player2_double_tie_image);
+			
+			player1TieCardDisplay = (TextView)findViewById(R.id.p1tie_tv);
+			player2TieCardDisplay = (TextView)findViewById(R.id.p2tie_tv);
+			
+			playButton = (Button)findViewById(R.id.play_button);
+			playButton.setOnClickListener(new OnClickListener()
+			{
+
+				@Override
+				public void onClick(View arg0) 
+				{
+					card.Compare();
+					updateUI(card);
+				}
+				
+			});
+		}
+		
+		catch(IOException ex)
+		{
+			
+		}
+		
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_card_game__war_main, menu);
+		return true;
+	}
+	
+	private void RestartGame()
+	{
+		Intent intent = new Intent(CardGame_WarMain.this, CardGame_WarMain.class);
+		finish();
+		startActivity(intent);
+	}
+
+	private void setImage(String p1, String p2, String p1Tie, String p2Tie, String p1Tie2, String p2Tie2) 
+	{
+		final AssetManager assets = getAssets();
+		final BufferedInputStream wager1;
+		final BufferedInputStream wager2;
+		BufferedInputStream is, is2, is3, is4, is5, is6;
+		Bitmap bitmap;
+		
+		try
+		{
+			is = new BufferedInputStream(assets.open(p1 + ".png"));
+			is2 = new BufferedInputStream(assets.open(p2 + ".png"));
+			
+			wager1 = new BufferedInputStream(assets.open("face_down.png"));
+			wager2 = new BufferedInputStream(assets.open("face_down_2.png"));
+			/*
+			 * first condition is to check if tie is present or not
+			 * if all tie variables are null, no tie has occurred
+			 */
+			//No Tie
+			if(p1Tie == null && p2Tie == null && p1Tie2 == null && p2Tie2 == null)
+			{
+				p1TieCard.setVisibility(View.INVISIBLE);
+				p2TieCard.setVisibility(View.INVISIBLE);
+				p1Wager.setVisibility(View.INVISIBLE);
+				p2Wager.setVisibility(View.INVISIBLE);
+				p1DoubleTie.setVisibility(View.INVISIBLE);
+				p2DoubleTie.setVisibility(View.INVISIBLE);
+				
+				bitmap = BitmapFactory.decodeStream(is);
+				p1Card.setImageBitmap(bitmap);
+				bitmap = BitmapFactory.decodeStream(is2);
+				p2Card.setImageBitmap(bitmap);
+			}
+			//Single Tie
+			else if(p1Tie != null && p2Tie != null && p1Tie2 == null && p2Tie2 == null)
+			{
+				player1TieCardDisplay.setVisibility(View.VISIBLE);
+				player2TieCardDisplay.setVisibility(View.VISIBLE);
+				
+				p1TieCard.setVisibility(View.VISIBLE);
+				p2TieCard.setVisibility(View.VISIBLE);
+				p1Wager.setVisibility(View.VISIBLE);
+				p2Wager.setVisibility(View.VISIBLE);
+				p1DoubleTie.setVisibility(View.INVISIBLE);
+				p2DoubleTie.setVisibility(View.INVISIBLE);
+				
+				bitmap = BitmapFactory.decodeStream(is);
+				p1Card.setImageBitmap(bitmap);
+				bitmap = BitmapFactory.decodeStream(is2);
+				p2Card.setImageBitmap(bitmap);
+				
+				is3 = new BufferedInputStream(assets.open(p1Tie + ".png"));
+				is4 = new BufferedInputStream(assets.open(p2Tie + ".png"));
+				bitmap = BitmapFactory.decodeStream(is3);
+				p1TieCard.setImageBitmap(bitmap);
+				bitmap = BitmapFactory.decodeStream(is4);
+				p2TieCard.setImageBitmap(bitmap);
+				
+				bitmap = BitmapFactory.decodeStream(wager1);
+				p1Wager.setImageBitmap(bitmap);
+				p2Wager.setImageBitmap(bitmap);
+			}
+			//Double Tie
+			else if(p1Tie != null && p2Tie != null && p1Tie2 != null && p2Tie2 != null)
+			{
+				player1TieCardDisplay.setVisibility(View.VISIBLE);
+				player2TieCardDisplay.setVisibility(View.VISIBLE);
+				
+				p1TieCard.setVisibility(View.VISIBLE);
+				p2TieCard.setVisibility(View.VISIBLE);
+				p1Wager.setVisibility(View.VISIBLE);
+				p2Wager.setVisibility(View.VISIBLE);
+				p1DoubleTie.setVisibility(View.VISIBLE);
+				p2DoubleTie.setVisibility(View.VISIBLE);
+				
+				bitmap = BitmapFactory.decodeStream(is);
+				p1Card.setImageBitmap(bitmap);
+				bitmap = BitmapFactory.decodeStream(is2);
+				p2Card.setImageBitmap(bitmap);
+				
+				is3 = new BufferedInputStream(assets.open(p1Tie + ".png"));
+				is4 = new BufferedInputStream(assets.open(p2Tie + ".png"));
+				bitmap = BitmapFactory.decodeStream(is3);
+				p1TieCard.setImageBitmap(bitmap);
+				bitmap = BitmapFactory.decodeStream(is4);
+				p2TieCard.setImageBitmap(bitmap);
+				
+				is5 = new BufferedInputStream(assets.open(p1Tie2 + ".png"));
+				is6 = new BufferedInputStream(assets.open(p2Tie2 + ".png"));
+				bitmap = BitmapFactory.decodeStream(is5);
+				p1DoubleTie.setImageBitmap(bitmap);
+				bitmap = BitmapFactory.decodeStream(is6);
+				p2DoubleTie.setImageBitmap(bitmap);
+				
+				bitmap = BitmapFactory.decodeStream(wager2);
+				p1Wager.setImageBitmap(bitmap);
+				p2Wager.setImageBitmap(bitmap);
+			}
+		}
+		
+		catch(IOException ex)
+		{
+			
+		}
+	}
+	
+	private void updateUI(Card card)
+	{
+		if(card.getPlayer1Count() <= 0 || card.getPlayer2Count() <= 0)
+		{
+			//Make a dialog
+			Builder endGame = new AlertDialog.Builder(this);
+			endGame.setMessage("End of the Game!" + '\n' + "Do you want to play again?");
+			endGame.setCancelable(false).setPositiveButton("Play Again!", new DialogInterface.OnClickListener()
+			{
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					RestartGame();
+				}
+			});
+			endGame.setNegativeButton("No Thanks.", new DialogInterface.OnClickListener() 
+			{
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					dialog.cancel();
+				}
+			});
+			
+			playButton.setEnabled(false);
+			endGame.show();
+		}
+		else
+		{
+			p1Count.setText("Player 1's Card Count: " + card.getPlayer1Count());
+			p2Count.setText("Player 2's Card Count: " + card.getPlayer2Count());
+			winner.setText("Winner of that Round was: " + card.getWinner());
+			
+			if(card.getPlayer1Rank() == card.getPlayer2Rank())
+			{
+				if(card.getPlayer1TieR() == card.getPlayer2TieR())
+				{
+					setImage(card.getP1CardFlag(), card.getP2CardFlag(), card.getP1TieFlag1(), card.getP2TieFlag1(), card.getP1TieFlag2(), card.getP2TieFlag2());
+				}
+				else
+				{
+					setImage(card.getP1CardFlag(), card.getP2CardFlag(), card.getP1TieFlag1(), card.getP2TieFlag1(), null, null);
+				}
+			}
+			else
+			{
+				setImage(card.getP1CardFlag(), card.getP2CardFlag(), null, null, null, null);
+			}
+		}
+		
+		
+	}
+
+}

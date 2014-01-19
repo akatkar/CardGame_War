@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CardGame_War</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <color name="background">#3500ffff</color>
+    <string name="title">Fancy a War?</string>
+    <string name="button_string">Play A Round!</string>
+    <string name="player1">Player 1:</string>
+    <string name="player2">Player 2:</string>
+    <string name="player1_tie">Player 1 Tie Card:</string>
+    <string name="player2_tie">Player 2 Tie Card:</string>
+    <string name="round_winner">"Winner of that Round was Player: "</string>
+    <string name="player1_count">"Player 1's Card Count: "</string>
+    <string name="player2_count">"Player 2's Card Count: "</string>
+    <string name="p1_wager_string">"Player 1's Wager"</string>
+    <string name="p2_wager_string">"Player 2's Wager Card"</string>
+    <string name="p1_double_tie">"Player 1's Double Tie Card"</string>
+    <string name="p2_double_tie">"Player 2's Double Tie Card"</string>
+
+</resources>
